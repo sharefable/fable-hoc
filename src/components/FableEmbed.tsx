@@ -1,5 +1,5 @@
-import React, { useEffect } from "react"
-import type { IAnnotationConfig } from "./types";
+import React, { useEffect } from 'react';
+import type { IAnnotationConfig } from './types';
 
 type OnAnnotationChange = (
   currentAnnoationIndex: number,
@@ -28,6 +28,7 @@ interface IProps {
 const FableEmbed = (props: IProps) => {
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function handleMessage(res: any) {
       const data = res.data.payload;
       if (res.data.type === 'on-annotation-navigation' && props.onAnnotationChange) {
@@ -39,19 +40,19 @@ const FableEmbed = (props: IProps) => {
           data.demoDisplayName,
           data.demoRid,
           data.demoUrl
-        )
+        );
       }
       if (res.data?.type === 'demo-loading-finished' && props.onLoaded) {
-        props.onLoaded(data.annConfigs, data.demoUrl, data.demoDisplayName, data.demoRid)
+        props.onLoaded(data.annConfigs, data.demoUrl, data.demoDisplayName, data.demoRid);
       }
     }
 
-    window.addEventListener('message', handleMessage)
+    window.addEventListener('message', handleMessage);
 
     return () => {
-      window.removeEventListener('message', handleMessage)
-    }
-  }, [props])
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [props]);
 
   return (
     <iframe
@@ -67,7 +68,7 @@ const FableEmbed = (props: IProps) => {
       allowFullScreen
       id="sharefable"
     />
-  )
-}
+  );
+};
 
-export default FableEmbed
+export default FableEmbed;

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "declaration": true,
+    "declarationDir": "dist/types",
     "esModuleInterop": true,
     "jsx": "react",
     "lib": [
@@ -27,5 +28,13 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx"
-  ]
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ],
+  "typedocOptions": {
+    "entryPoints": ["src/index.ts"],
+    "out": "docs"
+  }
 }

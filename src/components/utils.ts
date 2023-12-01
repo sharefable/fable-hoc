@@ -1,5 +1,5 @@
-export const navAnn = (dir: "prev" | "next", fableRef: React.RefObject<HTMLIFrameElement>) => {
-  const win = fableRef.current
+export const navAnn = (dir: 'prev' | 'next', fableRef: React.RefObject<HTMLIFrameElement>) => {
+  const win = fableRef.current;
   if (win) {
     win.contentWindow?.postMessage(
       {
@@ -12,4 +12,4 @@ export const navAnn = (dir: "prev" | "next", fableRef: React.RefObject<HTMLIFram
       '*'
     );
   }
-}
+};
