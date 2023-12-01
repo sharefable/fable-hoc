@@ -77,7 +77,7 @@ export default [
   ...config,
   {
     input: 'dist/types/index.d.ts',
-    output: [{ file: 'dist/index.d.ts', format: 'esm' }],
+    output: [{ file: 'dist/fable-hoc.d.ts', format: 'esm' }],
     plugins: [dts.default()],
     external: [/\.css$/]
   }

@@ -2,9 +2,24 @@
   "name": "fable-hoc",
   "version": "1.0.0",
   "description": "",
+  "keywords": [
+    "fable"
+  ],
+  "homepage": "",
+  "repository": {
+    "url": "https://github.com/sharefable/fable-hoc"
+  },
+  "private": false,
   "main": "dist/fable-hoc.cjs",
   "module": "dist/fable-hoc.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/fable-hoc.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/fable-hoc.d.ts",
+      "require": "./dist/fable-hoc.cjs",
+      "import": "./dist/fable-hoc.mjs"
+    }
+  },
   "files": [
     "dist",
     "README.md"
