@@ -1,19 +1,12 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import FableEmbed from './FableEmbed';
 import parse from 'html-react-parser';
 import markdown from '@wcj/markdown-to-html';
 import { navAnn } from './utils';
+import type { IFableData } from './types';
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
-  data: {
-    version: number
-    demoRid: string
-    env: 'staging' | 'prod'
-    loadingContent: {
-      md: string
-    }
-    content: Array<{ index: number, md: React.ReactNode }>
-  }
+  data: IFableData
 }
 
 /**
@@ -55,6 +48,9 @@ const Fable = ({ data, ...rest }: IProps) => {
     if (content.length) setCurrContent(content[0].md as string);
   }, [annIndex, data.content]);
 
+  const cachedOnLoadedFn = useCallback(() => {
+    setIsAnnLoaded(true);
+  }, []);
 
   return (
     <div {...rest}>
@@ -67,9 +63,7 @@ const Fable = ({ data, ...rest }: IProps) => {
       <FableEmbed
         demoRid={data.demoRid}
         innerRef={fableRef}
-        onLoaded={() => {
-          setIsAnnLoaded(true);
-        }}
+        onLoaded={cachedOnLoadedFn}
         onAnnotationChange={(index) => {
           setAnnIndex(index);
         }}

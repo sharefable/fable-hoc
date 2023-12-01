@@ -5,11 +5,37 @@ export interface IFableData {
   loadingContent: {
     md: string
   }
-  content: Array<{ index: number, md: React.ReactNode }>
+  content: Array<{ index: number, md: string }>
 }
 
 export interface IAnnotationConfig extends IAnnotationOriginConfig {
   syncPending: boolean;
+}
+
+export interface NavigateToAnnMessage<T> extends MessageEvent {
+  data: Msg<T>
+}
+
+interface Msg<T> extends MsgBase {
+  payload: T
+}
+
+interface MsgBase {
+  sender: 'sharefable.com',
+  type: ExtMsg,
+}
+
+export enum ExtMsg {
+  DemoLoadingStarted = 'demo-loading-started',
+  DemoLoadingFinished = 'demo-loading-finished',
+  OnAnnotationNav = 'on-annotation-navigation',
+  JourneySwitch = 'journey-switch',
+  NavToAnnotation = 'navigate-to-annotation'
+}
+
+export interface Payload_NavToAnnotation {
+  refId?: string
+  action?: 'prev' | 'next'
 }
 
 const AnnotationSelectionShape = ['box', 'pulse'] as const;
@@ -119,5 +145,3 @@ interface IAnnotationOriginConfig extends IChronoUpdatable {
   annCSSStyle: string;
   annotationSelectionColor: string;
 }
-
-

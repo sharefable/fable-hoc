@@ -52,7 +52,7 @@ const FableEmbed = (props: IProps) => {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [props]);
+  }, [props.onLoaded, props.onAnnotationChange]);
 
   return (
     <iframe
