@@ -4,7 +4,6 @@ import ts from '@rollup/plugin-typescript';
 import typescript from 'typescript';
 import dts from 'rollup-plugin-dts';
 import terser from '@rollup/plugin-terser';
-import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import * as pkg from './package.json';
 
 const input = ['src/index.ts'];
@@ -26,7 +25,6 @@ const buildFormats = [
 ];
 
 const sharedPlugins = [
-  peerDepsExternal(),
   resolve(),
   commonjs(),
   terser(),
