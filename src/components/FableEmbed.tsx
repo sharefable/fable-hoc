@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import type { IAnnotationConfig } from './types';
+import type { IAnnotationConfig, NavigateToAnnMessage, EventMessageResponse } from './types';
 
 type OnAnnotationChange = (
   currentAnnoationIndex: number,
@@ -28,8 +28,7 @@ interface IProps {
 const FableEmbed = (props: IProps) => {
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function handleMessage(res: any) {
+    function handleMessage(res: NavigateToAnnMessage<EventMessageResponse>) {
       const data = res.data.payload;
       if (res.data.type === 'on-annotation-navigation' && props.onAnnotationChange) {
         props.onAnnotationChange(
@@ -39,7 +38,7 @@ const FableEmbed = (props: IProps) => {
           data.annotationConfig,
           data.demoDisplayName,
           data.demoRid,
-          data.demoUrl
+          data.demoUrl,
         );
       }
       if (res.data?.type === 'demo-loading-finished' && props.onLoaded) {

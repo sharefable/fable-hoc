@@ -8,6 +8,25 @@ export interface IFableData {
   content: Array<{ index: number, md: string }>
 }
 
+export interface Payload_AnnotationNav extends CommonPayloadProps {
+  currentAnnoationIndex: number;
+  totalNumberOfAnnotationsInCurrentTimeline: number;
+  journeyName: string | null;
+  annotationConfig: IAnnotationConfig;
+}
+
+interface CommonPayloadProps {
+  demoRid: string,
+  demoDisplayName: string,
+  demoUrl: string
+}
+
+export type EventMessageResponse = Payload_AnnotationNav & Payload_DemoLoadingFinished;
+
+export interface Payload_DemoLoadingFinished extends CommonPayloadProps {
+  annConfigs: IAnnotationConfig[]
+}
+
 export interface IAnnotationConfig extends IAnnotationOriginConfig {
   syncPending: boolean;
 }
@@ -76,13 +95,7 @@ interface IAnnotationButton {
   style: AnnotationButtonStyle;
   size: AnnotationButtonSize;
   exclude?: boolean;
-  // This is used to sort buttons for display
-  // next button normally have very high order since it would be towards the end
-  // prev button normally have very low order since it would be towards the start
-  // all the other buttons are in between
   order: number;
-  // TODO right now hotspots are created from here for. Later on with other entity check where
-  // the hotspot could be created
   hotspot: ITourEntityHotspot | null;
 }
 
