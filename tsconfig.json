@@ -34,7 +34,9 @@
     "node_modules"
   ],
   "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
+    "entryPoints": [
+      "src/index.ts"
+    ],
     "out": "docs"
   }
 }

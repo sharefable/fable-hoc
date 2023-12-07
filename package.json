@@ -5,6 +5,7 @@
   "keywords": [
     "fable"
   ],
+  "type": "module",
   "homepage": "",
   "repository": {
     "url": "https://github.com/sharefable/fable-hoc"
