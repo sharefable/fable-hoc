@@ -51,22 +51,23 @@ const Fable = ({ data, ...rest }: IProps) => {
   const cachedOnLoadedFn = useCallback(() => {
     setIsAnnLoaded(true);
   }, []);
+  const cachedOnAnnotationChange = useCallback((index: number) => {
+    setAnnIndex(index);
+  }, []);
 
   return (
     <div {...rest}>
       <div className="fable-text" ref={mdConRef}>
         {!isAnnLoaded ?
-          parse(markdown(data.loadingContent.md as string) as string) :
-          parse(markdown(currContent as string) as string)
+          parse(markdown(data.loadingContent.md) as string) :
+          parse(markdown(currContent) as string)
         }
       </div>
       <FableEmbed
         demoRid={data.demoRid}
         innerRef={fableRef}
         onLoaded={cachedOnLoadedFn}
-        onAnnotationChange={(index) => {
-          setAnnIndex(index);
-        }}
+        onAnnotationChange={cachedOnAnnotationChange}
       />
     </div>
   );
