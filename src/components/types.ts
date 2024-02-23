@@ -1,3 +1,13 @@
+export interface JourneyFlow {
+  header1: string;
+  header2: string;
+  main: string;
+}
+
+export interface IAnnotationConfigWithScreenId extends IAnnotationConfig {
+  screenId: number
+}
+
 export interface IFableData {
   version: number
   demoRid: string
@@ -13,6 +23,7 @@ export interface Payload_AnnotationNav extends CommonPayloadProps {
   totalNumberOfAnnotationsInCurrentTimeline: number;
   journeyName: string | null;
   annotationConfig: IAnnotationConfig;
+  journeyIndex: number | null;
 }
 
 interface CommonPayloadProps {
@@ -25,6 +36,11 @@ export type EventMessageResponse = Payload_AnnotationNav & Payload_DemoLoadingFi
 
 export interface Payload_DemoLoadingFinished extends CommonPayloadProps {
   annConfigs: IAnnotationConfig[]
+  journeyData: JourneyModuleWithAnns[] | null
+}
+
+export interface JourneyModuleWithAnns extends JourneyFlow {
+  annsInOrder: IAnnotationConfigWithScreenId[]
 }
 
 export interface IAnnotationConfig extends IAnnotationOriginConfig {

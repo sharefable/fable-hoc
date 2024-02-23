@@ -1,7 +1,7 @@
 import Fable from './components/Fable';
+import FableHoc from './template/FableHoc';
 import type { IFableData } from './components/types';
 
 export default Fable;
-export type {
-  IFableData
-};
+export { FableHoc };
+export type { IFableData };
