@@ -4,14 +4,13 @@ import type {
   NavigateToAnnMessage,
   EventMessageResponse,
   JourneyModuleWithAnns,
+  Payload_AnnotationNav,
+  Payload_DemoLoadingFinished,
 } from './types';
 
 type OnAnnotationChange = (
-  currentAnnoationIndex: number,
-  annotationConfig: IAnnotationConfig,
+  currentAnnotationRefId: string,
   journeyIndex: number | null,
-  journeyName: string | null,
-  totalNumberOfAnnotationsInCurrentTimeline: number,
   demoDisplayName: string,
   demoRid: string,
   demoUrl: string,
@@ -33,25 +32,32 @@ interface IProps {
 }
 
 const FableEmbed = (props: IProps) => {
+
+  const getDemoUrl = (demoRid: string, params?: { hm: 0 | 1, ha: 0 | 1 }) => {
+    const param = params || { hm: 1, ha: 0 };
+    const str = JSON.stringify(param);
+    const query = encodeURIComponent(btoa(str));
+    const url = `http://localhost:3000/p/demo/${demoRid}?c=${query}`;
+    return url;
+  };
+
   useEffect(() => {
     function handleMessage(res: NavigateToAnnMessage<EventMessageResponse>) {
-      const data = res.data.payload;
       if (
-        res.data.type === 'on-annotation-navigation' &&
+        res.data.type === 'on-navigation' &&
         props.onAnnotationChange
       ) {
+        const data = res.data.payload as Payload_AnnotationNav;
         props.onAnnotationChange(
-          data.currentAnnoationIndex,
-          data.annotationConfig,
+          data.currentAnnotationRefId,
           data.journeyIndex,
-          data.journeyName,
-          data.totalNumberOfAnnotationsInCurrentTimeline,
           data.demoDisplayName,
           data.demoRid,
           data.demoUrl,
         );
       }
-      if (res.data?.type === 'demo-loading-finished' && props.onLoaded) {
+      if (res.data.type === 'demo-loading-finished' && props.onLoaded) {
+        const data = res.data.payload as Payload_DemoLoadingFinished;
         props.onLoaded(
           data.annConfigs,
           data.demoUrl,
@@ -77,9 +83,11 @@ const FableEmbed = (props: IProps) => {
         width: '100%',
         height: '100%',
         marginTop: '1rem',
+        minHeight: '40rem',
       }}
+      height="100%"
       className="fable-embed"
-      src={`http://localhost:3000/p/demo/${props.demoRid}`}
+      src={getDemoUrl(props.demoRid)}
       allowFullScreen
       id="sharefable"
     />

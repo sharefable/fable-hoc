@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import FableEmbed from '../components/FableEmbed';
-import { navAnn } from '../components/utils';
+import { navAnn, goToFirstAnnOfModule } from '../components/utils';
 import { IAnnotationConfig, JourneyModuleWithAnns } from '../components/types';
 
 interface IProps {
@@ -21,36 +21,37 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
     demoUrl: string,
     demoDisplayName: string,
     demoRid: string,
-    journeyData: JourneyModuleWithAnns[] | null
+    jrnyData: JourneyModuleWithAnns[] | null,
+
   ) => {
     setIsAnnLoaded(true);
-    setJourneyData(journeyData);
-    if (!journeyData?.length) return;
-    setCurrAnnRefId(journeyData[0].annsInOrder[0].refId);
+    setJourneyData(jrnyData);
+    if (!jrnyData?.length) return;
+    setCurrAnnRefId(jrnyData[0].annsInOrder[0].refId);
   }, []);
 
   const onChange = useCallback((
-    index: number,
-    annotationConfig: IAnnotationConfig,
-    journeyIndex: number | null,
+    currentAnnotationRefId: string,
+    jrnyIdx: number | null,
   ) => {
-    setJourneyIndex(journeyIndex || 0);
-    if (journeyData?.length) {
-      setCurrAnnRefId(annotationConfig.refId);
-    }
-  }, [journeyData]);
+    setCurrAnnRefId(currentAnnotationRefId);
+    setJourneyIndex(jrnyIdx || 0);
+  }, []);
 
   useEffect(() => {
     if (!isAnnLoaded) return;
     const target = textContainerRef.current?.querySelector(`[data-f-id="${currAnnRefId}"]`) as HTMLElement;
-    target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const center = target.offsetTop - window.innerHeight / 2;
+    window.scrollTo({
+      top: center,
+      behavior: 'smooth',
+    });
   }, [currAnnRefId, journeyIndex]);
 
   return (
     <div
       style={{
         width: '100%',
-        height: '50rem',
         background: '#FFF7F1',
         display: 'flex',
         flexDirection: 'column',
@@ -64,7 +65,6 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
           display: 'flex',
           flexDirection: 'row',
           gap: '1rem',
-          overflow: 'auto',
           padding: '1rem',
           flex: '0 0 auto',
         }}
@@ -84,14 +84,16 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
           display: 'flex',
           flexDirection: layout === 'row' ? 'row-reverse' : 'column',
           width: '100%',
-          overflow: 'hidden',
-          flex: '1'
+          flex: '1',
         }}>
         <div
           style={{
+            minHeight: '50rem',
             width: '100%',
             height: layout === 'col' ? '25rem' : 'calc(100% - 4rem)',
-            flex: layout === 'col' ? '0 0 auto' : '1'
+            flex: layout === 'col' ? '0 0 auto' : '1',
+            position: 'sticky',
+            top: '1rem',
           }}
         >
           <FableEmbed
@@ -137,16 +139,15 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
           ref={textContainerRef}
           style={{
             marginTop: layout === 'col' ? '4rem' : '2rem',
-            overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            overflowY: 'auto',
             height: '100%',
             width: '100%',
             maxWidth: layout === 'col' ? '40rem' : '20rem',
             scrollbarWidth: 'thin',
             marginLeft: 'auto',
             marginRight: 'auto',
+            cursor: disableMouse ? 'progress' : 'pointer',
           }}
         >
           {journeyData?.map((journey, jIdx) => {
@@ -168,7 +169,6 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
                         padding: '1rem',
                         borderRadius: '0.5rem',
                         boxShadow: currAnnRefId === ann.refId ? '0 0 0 2px rgba(0, 0, 0)' : '',
-                        cursor: disableMouse ? 'progress' : 'pointer',
                         transition: 'box-shadow 0.8s ease',
 
                       }}
@@ -181,35 +181,83 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
                         const clickedAnnIdx = idx;
                         const currJourneyIdx = journeyIndex;
                         const currAnnIdx = journeyData[currJourneyIdx].annsInOrder.findIndex((ann) => ann.refId === currAnnRefId);
+                        const wait = 1500;
                         let diff: number = 0;
 
                         if (currJourneyIdx !== clickedJourneyIdx) {
+                          const startIdx = Math.min(currJourneyIdx, clickedJourneyIdx);
+                          const endIdx = Math.max(currJourneyIdx, clickedJourneyIdx);
+
+                          for (let i = startIdx + 1; i < endIdx; i++) {
+                            diff += journeyData[i].annsInOrder.length;
+                          }
+
                           if (clickedJourneyIdx - currJourneyIdx >= 1) {
-                            diff = journeyData[currJourneyIdx].annsInOrder.length - currAnnIdx + clickedAnnIdx;
-                            for (let i = currJourneyIdx + 1; i < clickedJourneyIdx; i++) {
-                              diff += journeyData[i].annsInOrder.length;
-                            }
+                            diff += journeyData[currJourneyIdx].annsInOrder.length - currAnnIdx + clickedAnnIdx;
                           } else {
-                            diff = clickedAnnIdx - journeyData[clickedJourneyIdx].annsInOrder.length - currAnnIdx;
-                            for (let i = currJourneyIdx - 1; i > clickedJourneyIdx; i--) {
-                              diff -= journeyData[i].annsInOrder.length;
-                            }
+                            diff += clickedAnnIdx - journeyData[clickedJourneyIdx].annsInOrder.length - currAnnIdx;
                           }
                         } else {
                           diff = clickedAnnIdx - currAnnIdx;
                         }
+                        if (diff === 0) {
+                          setMouseDisable(false);
+                          return;
+                        }
 
-                        if (diff <= 0) return;
                         setMouseDisable(true);
-                        let i = 1;
-                        const interval = setInterval(() => {
-                          if (i === diff) {
-                            setMouseDisable(false);
-                            clearInterval(interval);
+                        if (clickedJourneyIdx === currJourneyIdx && diff < 0) {
+                          let i = 0;
+                          const interval = setInterval(() => {
+                            if (i >= Math.abs(diff) - 1) {
+                              setMouseDisable(false);
+                              clearInterval(interval);
+                            }
+                            navAnn('prev', fableRef);
+                            i++;
+                          }, wait);
+                          return;
+                        }
+
+                        if (diff < 0) {
+                          if (clickedJourneyIdx === currJourneyIdx) {
+                            let i = 0;
+                            const interval = setInterval(() => {
+                              if (i >= Math.abs(diff) - 1) {
+                                setMouseDisable(false);
+                                clearInterval(interval);
+                              }
+                              navAnn('prev', fableRef);
+                              i++;
+                            }, wait);
+                            return;
+                          } else {
+                            const jrny = journeyData[clickedJourneyIdx];
+                            const firstAnnRefId = jrny.annsInOrder[0].refId;
+                            const firstAnnScreenId = jrny.annsInOrder[0].screenId;
+                            goToFirstAnnOfModule(firstAnnScreenId, firstAnnRefId, fableRef);
+                            setJourneyIndex(clickedJourneyIdx);
+                            setCurrAnnRefId(firstAnnRefId);
+                            if (clickedAnnIdx === 0) {
+                              setMouseDisable(false);
+                              return;
+                            }
+                            diff = clickedAnnIdx;
                           }
-                          navAnn('next', fableRef);
-                          i++;
-                        }, 2000);
+                        }
+
+                        if (diff > 0) {
+                          let i = 0;
+                          const interval = setInterval(() => {
+                            if (i >= diff - 1) {
+                              setMouseDisable(false);
+                              clearInterval(interval);
+                            }
+                            navAnn('next', fableRef);
+                            i++;
+                          }, 1500);
+                          return;
+                        }
                       }}
                     >
                       <div

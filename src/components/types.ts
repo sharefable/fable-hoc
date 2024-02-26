@@ -24,6 +24,8 @@ export interface Payload_AnnotationNav extends CommonPayloadProps {
   journeyName: string | null;
   annotationConfig: IAnnotationConfig;
   journeyIndex: number | null;
+  currentAnnotationRefId: string;
+  clickedButtonType: IAnnotationButtonType;
 }
 
 interface CommonPayloadProps {
@@ -32,7 +34,7 @@ interface CommonPayloadProps {
   demoUrl: string
 }
 
-export type EventMessageResponse = Payload_AnnotationNav & Payload_DemoLoadingFinished;
+export type EventMessageResponse = Payload_AnnotationNav | Payload_DemoLoadingFinished;
 
 export interface Payload_DemoLoadingFinished extends CommonPayloadProps {
   annConfigs: IAnnotationConfig[]
@@ -63,7 +65,7 @@ interface MsgBase {
 export enum ExtMsg {
   DemoLoadingStarted = 'demo-loading-started',
   DemoLoadingFinished = 'demo-loading-finished',
-  OnAnnotationNav = 'on-annotation-navigation',
+  OnNavigation = 'on-navigation',
   JourneySwitch = 'journey-switch',
   NavToAnnotation = 'navigate-to-annotation'
 }
