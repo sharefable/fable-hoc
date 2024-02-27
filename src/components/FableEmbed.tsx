@@ -29,6 +29,7 @@ interface IProps {
   innerRef?: React.Ref<HTMLIFrameElement>;
   onLoaded?: OnLoaded;
   onAnnotationChange?: OnAnnotationChange;
+  style?: React.CSSProperties;
 }
 
 const FableEmbed = (props: IProps) => {
@@ -83,7 +84,7 @@ const FableEmbed = (props: IProps) => {
         width: '100%',
         height: '100%',
         marginTop: '1rem',
-        minHeight: '40rem',
+        ...props.style,
       }}
       height="100%"
       className="fable-embed"

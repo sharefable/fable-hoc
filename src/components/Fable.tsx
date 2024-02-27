@@ -15,7 +15,7 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 const Fable = ({ data, ...rest }: IProps) => {
   const [isAnnLoaded, setIsAnnLoaded] = useState<boolean>(false);
-  const [annIndex, setAnnIndex] = useState<number>(1);
+  const [annIndex, setAnnIndex] = useState<string>('1');
   const mdConRef = useRef<HTMLDivElement>(null);
   const fableRef = useRef<HTMLIFrameElement>(null);
   const [currContent, setCurrContent] = useState<string>(data?.content[0]?.md as string);
@@ -44,14 +44,14 @@ const Fable = ({ data, ...rest }: IProps) => {
   }, [currContent, isAnnLoaded]);
 
   useEffect(() => {
-    const content = data.content.filter((el) => el.index === annIndex);
+    const content = data.content.filter((el) => el.index === Number(annIndex));
     if (content.length) setCurrContent(content[0].md as string);
   }, [annIndex, data.content]);
 
   const cachedOnLoadedFn = useCallback(() => {
     setIsAnnLoaded(true);
   }, []);
-  const cachedOnAnnotationChange = useCallback((index: number) => {
+  const cachedOnAnnotationChange = useCallback((index: string) => {
     setAnnIndex(index);
   }, []);
 

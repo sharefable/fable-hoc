@@ -62,6 +62,7 @@ const config = allBuildFormats.map(
         name,
         globals,
         sourcemap: true,
+        exports: 'named',
       },
       external,
       plugins,

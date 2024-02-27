@@ -41,12 +41,29 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
   useEffect(() => {
     if (!isAnnLoaded) return;
     const target = textContainerRef.current?.querySelector(`[data-f-id="${currAnnRefId}"]`) as HTMLElement;
-    const center = target.offsetTop - window.innerHeight / 2;
-    window.scrollTo({
-      top: center,
-      behavior: 'smooth',
-    });
-  }, [currAnnRefId, journeyIndex]);
+    if (!target) return;
+    if (layout === 'row') {
+      const center = target.offsetTop - window.innerHeight / 2;
+      window.scrollTo({
+        top: center,
+        behavior: 'smooth',
+      });
+    } else {
+      const heightFromTextCon = target.offsetTop - textContainerRef.current!.offsetTop;
+      const textConHeight = textContainerRef.current!.offsetHeight;
+      if (heightFromTextCon > textConHeight / 2) {
+        textContainerRef.current!.scrollTo({
+          top: heightFromTextCon - textConHeight / 2,
+          behavior: 'smooth',
+        });
+      } else {
+        textContainerRef.current!.scrollTo({
+          top: 0,
+          behavior: 'smooth',
+        });
+      }
+    }
+  }, [currAnnRefId]);
 
   return (
     <div
@@ -56,6 +73,7 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
         display: 'flex',
         flexDirection: 'column',
         maxWidth: '1440px',
+        height: layout === 'col' ? 'calc(100vh - 2rem)' : 'auto',
       }}
       {...rest}
     >
@@ -88,12 +106,11 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
         }}>
         <div
           style={{
-            minHeight: '50rem',
             width: '100%',
-            height: layout === 'col' ? '25rem' : 'calc(100% - 4rem)',
+            height: layout === 'col' ? '28rem' : 'calc(100% - 4rem)',
             flex: layout === 'col' ? '0 0 auto' : '1',
-            position: 'sticky',
-            top: '1rem',
+            position: layout === 'row' ? 'sticky' : 'static',
+            top: layout === 'row' ? '1.5rem' : 'auto',
           }}
         >
           <FableEmbed
@@ -101,6 +118,9 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
             onLoaded={onLoaded}
             innerRef={fableRef}
             onAnnotationChange={onChange}
+            style={{
+              minHeight: layout === 'row' ? '40rem' : '100%',
+            }}
           />
           <div
             style={{
@@ -108,46 +128,44 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
               justifyContent: 'space-between',
               alignItems: 'center',
             }}
-          >{isAnnLoaded &&
-            (
-              <>
-                <span
-                  style={{
-                    background: 'rgba(0, 0, 0, 0.1)',
-                    cursor: 'pointer',
-                    padding: '1rem',
-                  }}
-                  onClick={() => navAnn('prev', fableRef)}
-                >
-                  Prev
-                </span>
-                <span
-                  style={{
-                    background: 'rgba(0, 0, 0, 0.1)',
-                    cursor: 'pointer',
-                    padding: '1rem',
-                  }}
-                  onClick={() => navAnn('next', fableRef)}
-                >
-                  Next
-                </span>
-              </>
-            )}
+          >
+            <span
+              style={{
+                background: 'rgba(0, 0, 0, 0.1)',
+                cursor: 'pointer',
+                padding: '1rem',
+              }}
+              onClick={() => navAnn('prev', fableRef)}
+            >
+              Prev
+            </span>
+            <span
+              style={{
+                background: 'rgba(0, 0, 0, 0.1)',
+                cursor: 'pointer',
+                padding: '1rem',
+              }}
+              onClick={() => navAnn('next', fableRef)}
+            >
+              Next
+            </span>
           </div>
         </div>
         <div
           ref={textContainerRef}
           style={{
+            margin: '1rem auto',
+            cursor: disableMouse ? 'progress' : 'pointer',
             marginTop: layout === 'col' ? '4rem' : '2rem',
+            overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
+            overflowY: 'auto',
             height: '100%',
             width: '100%',
             maxWidth: layout === 'col' ? '40rem' : '20rem',
             scrollbarWidth: 'thin',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            cursor: disableMouse ? 'progress' : 'pointer',
+            maxHeight: layout === 'col' ? '26.5rem' : '100%',
           }}
         >
           {journeyData?.map((journey, jIdx) => {
