@@ -5,24 +5,26 @@ import { IAnnotationConfig, JourneyModuleWithAnns } from '../components/types';
 
 interface IProps {
   layout?: 'row' | 'col';
+  origin?: string;
+  demoRid: string;
 }
 
-const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
+const FableHoc = ({ layout = 'col', origin, demoRid, ...rest }: IProps) => {
   const [currAnnRefId, setCurrAnnRefId] = useState<string>('');
   const [isAnnLoaded, setIsAnnLoaded] = useState(false);
   const [journeyData, setJourneyData] = useState<JourneyModuleWithAnns[] | null>(null);
   const [journeyIndex, setJourneyIndex] = useState(0);
   const fableRef = useRef<HTMLIFrameElement>(null);
+  const fableConRef = useRef<HTMLDivElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [disableMouse, setMouseDisable] = useState(false);
 
   const onLoaded = useCallback((
-    annConfigs: IAnnotationConfig[],
+    annConfigsArr: IAnnotationConfig[],
     demoUrl: string,
     demoDisplayName: string,
     demoRid: string,
     jrnyData: JourneyModuleWithAnns[] | null,
-
   ) => {
     setIsAnnLoaded(true);
     setJourneyData(jrnyData);
@@ -49,19 +51,13 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
         behavior: 'smooth',
       });
     } else {
-      const heightFromTextCon = target.offsetTop - textContainerRef.current!.offsetTop;
-      const textConHeight = textContainerRef.current!.offsetHeight;
-      if (heightFromTextCon > textConHeight / 2) {
-        textContainerRef.current!.scrollTo({
-          top: heightFromTextCon - textConHeight / 2,
-          behavior: 'smooth',
-        });
-      } else {
-        textContainerRef.current!.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
-      }
+      const bottomFableCon = fableConRef.current?.getBoundingClientRect().bottom;
+      const targetTop = target.getBoundingClientRect().top;
+      const targetHeight = target.getBoundingClientRect().height;
+      window.scrollBy({
+        top: targetTop - bottomFableCon! - targetHeight,
+        behavior: 'smooth',
+      });
     }
   }, [currAnnRefId]);
 
@@ -73,7 +69,7 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
         display: 'flex',
         flexDirection: 'column',
         maxWidth: '1440px',
-        height: layout === 'col' ? 'calc(100vh - 2rem)' : 'auto',
+        height: 'auto',
       }}
       {...rest}
     >
@@ -99,22 +95,26 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
       <div
         className=""
         style={{
-          display: 'flex',
-          flexDirection: layout === 'row' ? 'row-reverse' : 'column',
+          display: 'grid',
+          gridTemplateColumns: layout === 'col' ? '1fr' : '340px 1fr',
+          gridTemplateRows: layout === 'col' ? '40rem 1fr' : '1fr',
+          gap: '1rem',
           width: '100%',
-          flex: '1',
+          position: 'relative',
         }}>
         <div
+          ref={fableConRef}
           style={{
             width: '100%',
-            height: layout === 'col' ? '28rem' : 'calc(100% - 4rem)',
-            flex: layout === 'col' ? '0 0 auto' : '1',
-            position: layout === 'row' ? 'sticky' : 'static',
-            top: layout === 'row' ? '1.5rem' : 'auto',
+            height: layout === 'col' ? 'auto' : 'fit-content',
+            position: layout === 'row' ? 'sticky' : 'sticky',
+            top: layout === 'row' ? '1.5rem' : '0',
+            zIndex: 1,
           }}
         >
           <FableEmbed
-            demoRid="test-get2pic0iiosnvbo"
+            origin={origin}
+            demoRid={demoRid}
             onLoaded={onLoaded}
             innerRef={fableRef}
             onAnnotationChange={onChange}
@@ -157,15 +157,16 @@ const FableHoc = ({ layout = 'col', ...rest }: IProps) => {
             margin: '1rem auto',
             cursor: disableMouse ? 'progress' : 'pointer',
             marginTop: layout === 'col' ? '4rem' : '2rem',
-            overflow: 'auto',
             display: 'flex',
             flexDirection: 'column',
-            overflowY: 'auto',
             height: '100%',
             width: '100%',
             maxWidth: layout === 'col' ? '40rem' : '20rem',
             scrollbarWidth: 'thin',
-            maxHeight: layout === 'col' ? '26.5rem' : '100%',
+            maxHeight: '100%',
+            position: layout === 'col' ? 'sticky' : 'static',
+            top: layout === 'col' ? '1.5rem' : 'auto',
+            order: layout === 'row' ? -1 : 0,
           }}
         >
           {journeyData?.map((journey, jIdx) => {

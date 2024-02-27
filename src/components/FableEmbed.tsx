@@ -30,16 +30,19 @@ interface IProps {
   onLoaded?: OnLoaded;
   onAnnotationChange?: OnAnnotationChange;
   style?: React.CSSProperties;
+  origin?: string;
 }
 
 const FableEmbed = (props: IProps) => {
 
   const getDemoUrl = (demoRid: string, params?: { hm: 0 | 1, ha: 0 | 1 }) => {
-    const param = params || { hm: 1, ha: 0 };
+    const origin = props.origin || 'https://app.sharefable.com';
+    const param = params || { hm: 1, ha: 1 };
     const str = JSON.stringify(param);
     const query = encodeURIComponent(btoa(str));
-    const url = `http://localhost:3000/p/demo/${demoRid}?c=${query}`;
-    return url;
+    const url = new URL(`p/demo/${demoRid}?c=${query}`, origin);
+    // convert to string
+    return String(url);
   };
 
   useEffect(() => {
