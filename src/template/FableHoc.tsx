@@ -14,10 +14,129 @@ const FableHoc = ({ layout = 'col', origin, demoRid, ...rest }: IProps) => {
   const [isAnnLoaded, setIsAnnLoaded] = useState(false);
   const [journeyData, setJourneyData] = useState<JourneyModuleWithAnns[] | null>(null);
   const [journeyIndex, setJourneyIndex] = useState(0);
+  const [annConfigs, setAnnConfigs] = useState<IAnnotationConfig[]>([]);
   const fableRef = useRef<HTMLIFrameElement>(null);
   const fableConRef = useRef<HTMLDivElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [disableMouse, setMouseDisable] = useState(false);
+
+  const handleAnnotationClick = (idx: number, jIdx: number = 0) => {
+    const journeyPresent = journeyData && journeyData.length > 0;
+    let clickedJourneyIdx;
+    let currJourneyIdx;
+    let currAnnIdx;
+    const clickedAnnIdx = idx;
+    const wait = 1500;
+    let diff: number = 0;
+    if (journeyPresent) {
+      clickedJourneyIdx = jIdx;
+      currJourneyIdx = journeyIndex;
+      currAnnIdx = journeyData[currJourneyIdx].annsInOrder.findIndex((ann) => ann.refId === currAnnRefId);
+      if (currJourneyIdx !== clickedJourneyIdx) {
+        const startIdx = Math.min(currJourneyIdx, clickedJourneyIdx);
+        const endIdx = Math.max(currJourneyIdx, clickedJourneyIdx);
+
+        for (let i = startIdx + 1; i < endIdx; i++) {
+          diff += journeyData[i].annsInOrder.length;
+        }
+
+        if (clickedJourneyIdx - currJourneyIdx >= 1) {
+          diff += journeyData[currJourneyIdx].annsInOrder.length - currAnnIdx + clickedAnnIdx;
+        } else {
+          diff += clickedAnnIdx - journeyData[clickedJourneyIdx].annsInOrder.length - currAnnIdx;
+        }
+      } else {
+        diff = clickedAnnIdx - currAnnIdx;
+      }
+      if (diff === 0) {
+        setMouseDisable(false);
+        return;
+      }
+
+      setMouseDisable(true);
+      if (clickedJourneyIdx === currJourneyIdx && diff < 0) {
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i >= Math.abs(diff) - 1) {
+            setMouseDisable(false);
+            clearInterval(interval);
+          }
+          navAnn('prev', fableRef);
+          i++;
+        }, wait);
+        return;
+      }
+
+      if (diff < 0) {
+        if (clickedJourneyIdx === currJourneyIdx) {
+          let i = 0;
+          const interval = setInterval(() => {
+            if (i >= Math.abs(diff) - 1) {
+              setMouseDisable(false);
+              clearInterval(interval);
+            }
+            navAnn('prev', fableRef);
+            i++;
+          }, wait);
+          return;
+        } else {
+          const jrny = journeyData[clickedJourneyIdx];
+          const firstAnnRefId = jrny.annsInOrder[0].refId;
+          const firstAnnScreenId = jrny.annsInOrder[0].screenId;
+          goToFirstAnnOfModule(firstAnnScreenId, firstAnnRefId, fableRef);
+          setJourneyIndex(clickedJourneyIdx);
+          setCurrAnnRefId(firstAnnRefId);
+          if (clickedAnnIdx === 0) {
+            setMouseDisable(false);
+            return;
+          }
+          diff = clickedAnnIdx;
+        }
+      }
+
+      if (diff > 0) {
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i >= diff - 1) {
+            setMouseDisable(false);
+            clearInterval(interval);
+          }
+          navAnn('next', fableRef);
+          i++;
+        }, 1500);
+        return;
+      }
+    } else {
+      currAnnIdx = annConfigs.findIndex((ann) => ann.refId === currAnnRefId);
+      diff = clickedAnnIdx - currAnnIdx;
+      if (diff === 0) return;
+      setMouseDisable(true);
+      if (diff < 0) {
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i >= Math.abs(diff) - 1) {
+            setMouseDisable(false);
+            clearInterval(interval);
+          }
+          navAnn('prev', fableRef);
+          i++;
+        }, wait);
+        return;
+      }
+      if (diff > 0) {
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i >= diff - 1) {
+            setMouseDisable(false);
+            clearInterval(interval);
+          }
+          navAnn('next', fableRef);
+          i++;
+        }, wait);
+        return;
+      }
+    }
+  };
 
   const onLoaded = useCallback((
     annConfigsArr: IAnnotationConfig[],
@@ -26,10 +145,17 @@ const FableHoc = ({ layout = 'col', origin, demoRid, ...rest }: IProps) => {
     demoRid: string,
     jrnyData: JourneyModuleWithAnns[] | null,
   ) => {
+    console.log('onLoaded', annConfigsArr, demoUrl, demoDisplayName, demoRid, jrnyData);
     setIsAnnLoaded(true);
-    setJourneyData(jrnyData);
-    if (!jrnyData?.length) return;
-    setCurrAnnRefId(jrnyData[0].annsInOrder[0].refId);
+    if (annConfigsArr && annConfigsArr.length) {
+      setAnnConfigs(annConfigsArr);
+      setCurrAnnRefId(annConfigsArr[0].refId);
+      return;
+    } else {
+      setJourneyData(jrnyData);
+      if (!jrnyData?.length) return;
+      setCurrAnnRefId(jrnyData[0].annsInOrder[0].refId);
+    }
   }, []);
 
   const onChange = useCallback((
@@ -83,7 +209,7 @@ const FableHoc = ({ layout = 'col', origin, demoRid, ...rest }: IProps) => {
           flex: '0 0 auto',
         }}
       >
-        {journeyData?.map((item) => (
+        {journeyData && journeyData?.map((item) => (
           <div key={`journey-${item.main}`}>
             <div>
               <h1>{item.header1}</h1>
@@ -169,7 +295,7 @@ const FableHoc = ({ layout = 'col', origin, demoRid, ...rest }: IProps) => {
             order: layout === 'row' ? -1 : 0,
           }}
         >
-          {journeyData?.map((journey, jIdx) => {
+          {journeyData && journeyData?.map((journey, jIdx) => {
             return (
               <div
                 key={journey.main}
@@ -195,88 +321,7 @@ const FableHoc = ({ layout = 'col', origin, demoRid, ...rest }: IProps) => {
                       data-f-id={ann.refId}
                       data-f-annidx={idx}
                       onClick={() => {
-                        if (disableMouse) return;
-                        const clickedJourneyIdx = jIdx;
-                        const clickedAnnIdx = idx;
-                        const currJourneyIdx = journeyIndex;
-                        const currAnnIdx = journeyData[currJourneyIdx].annsInOrder.findIndex((ann) => ann.refId === currAnnRefId);
-                        const wait = 1500;
-                        let diff: number = 0;
-
-                        if (currJourneyIdx !== clickedJourneyIdx) {
-                          const startIdx = Math.min(currJourneyIdx, clickedJourneyIdx);
-                          const endIdx = Math.max(currJourneyIdx, clickedJourneyIdx);
-
-                          for (let i = startIdx + 1; i < endIdx; i++) {
-                            diff += journeyData[i].annsInOrder.length;
-                          }
-
-                          if (clickedJourneyIdx - currJourneyIdx >= 1) {
-                            diff += journeyData[currJourneyIdx].annsInOrder.length - currAnnIdx + clickedAnnIdx;
-                          } else {
-                            diff += clickedAnnIdx - journeyData[clickedJourneyIdx].annsInOrder.length - currAnnIdx;
-                          }
-                        } else {
-                          diff = clickedAnnIdx - currAnnIdx;
-                        }
-                        if (diff === 0) {
-                          setMouseDisable(false);
-                          return;
-                        }
-
-                        setMouseDisable(true);
-                        if (clickedJourneyIdx === currJourneyIdx && diff < 0) {
-                          let i = 0;
-                          const interval = setInterval(() => {
-                            if (i >= Math.abs(diff) - 1) {
-                              setMouseDisable(false);
-                              clearInterval(interval);
-                            }
-                            navAnn('prev', fableRef);
-                            i++;
-                          }, wait);
-                          return;
-                        }
-
-                        if (diff < 0) {
-                          if (clickedJourneyIdx === currJourneyIdx) {
-                            let i = 0;
-                            const interval = setInterval(() => {
-                              if (i >= Math.abs(diff) - 1) {
-                                setMouseDisable(false);
-                                clearInterval(interval);
-                              }
-                              navAnn('prev', fableRef);
-                              i++;
-                            }, wait);
-                            return;
-                          } else {
-                            const jrny = journeyData[clickedJourneyIdx];
-                            const firstAnnRefId = jrny.annsInOrder[0].refId;
-                            const firstAnnScreenId = jrny.annsInOrder[0].screenId;
-                            goToFirstAnnOfModule(firstAnnScreenId, firstAnnRefId, fableRef);
-                            setJourneyIndex(clickedJourneyIdx);
-                            setCurrAnnRefId(firstAnnRefId);
-                            if (clickedAnnIdx === 0) {
-                              setMouseDisable(false);
-                              return;
-                            }
-                            diff = clickedAnnIdx;
-                          }
-                        }
-
-                        if (diff > 0) {
-                          let i = 0;
-                          const interval = setInterval(() => {
-                            if (i >= diff - 1) {
-                              setMouseDisable(false);
-                              clearInterval(interval);
-                            }
-                            navAnn('next', fableRef);
-                            i++;
-                          }, 1500);
-                          return;
-                        }
+                        handleAnnotationClick(idx, jIdx);
                       }}
                     >
                       <div
@@ -311,6 +356,55 @@ const FableHoc = ({ layout = 'col', origin, demoRid, ...rest }: IProps) => {
                     </div>
                   );
                 })}
+              </div>
+            );
+          })}
+          {annConfigs && annConfigs.length > 0 && annConfigs.map((ann, idx) => {
+            return (
+              <div
+                style={{
+                  padding: '1rem',
+                  borderRadius: '0.5rem',
+                  boxShadow: currAnnRefId === ann.refId ? '0 0 0 2px rgba(0, 0, 0)' : '',
+                  transition: 'box-shadow 0.8s ease',
+
+                }}
+                key={ann.refId}
+                data-f-id={ann.refId}
+                data-f-annidx={idx}
+                onClick={() => {
+                  handleAnnotationClick(idx);
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.4rem',
+                    width: '100%',
+                  }}
+                >
+                  <span
+                    style={{
+                      borderRadius: '1rem',
+                      background: '#E78895',
+                      aspectRatio: '1/1',
+                      width: '2rem',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      color: 'white',
+                      fontSize: '0.8rem',
+                      fontWeight: 'bold',
+                      height: 'fit-content',
+                      padding: '0.4rem',
+                      minWidth: 'fit-content',
+                      minHeight: 'fit-content',
+                    }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <p>{ann.displayText}</p>
+                </div>
               </div>
             );
           })}
