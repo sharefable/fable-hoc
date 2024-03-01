@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import FableEmbed from '../components/FableEmbed';
-import { navAnn, goToFirstAnnOfModule, calculateDiff, navigate } from '../components/utils';
+import { navAnn, goToParticularAnn, calculateDiff } from '../components/utils';
 import { IAnnotationConfig, JourneyModuleWithAnns } from '../components/types';
 
 interface IProps {
@@ -8,6 +8,11 @@ interface IProps {
   layout?: 'sidebyside' | 'stacked';
   origin?: string;
   contentWidthPercentage?: number;
+}
+
+interface INavigationRef {
+  direction: 'prev' | 'next';
+  destinationRefId: string;
 }
 
 const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage = 30, ...rest }: IProps) => {
@@ -20,6 +25,24 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
   const fableConRef = useRef<HTMLDivElement>(null);
   const textContainerRef = useRef<HTMLDivElement>(null);
   const [disableMouse, setMouseDisable] = useState(false);
+  const navigateRef = useRef<INavigationRef | null>(null);
+
+  const navigate = (
+    direction: 'next' | 'prev',
+    noOfTimes: number,
+    navAnn: (dir: 'prev' | 'next', fableRef: React.RefObject<HTMLIFrameElement>) => void,
+    fableRef: React.RefObject<HTMLIFrameElement>,
+    wait: number = 1500
+  ) => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i >= noOfTimes - 1) {
+        clearInterval(interval);
+      }
+      navAnn(direction, fableRef);
+      i++;
+    }, wait);
+  };
 
   const handleNavigation = (
     diff: number,
@@ -37,14 +60,14 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
     if (journeyData && currJourneyIdx !== undefined && clickedJourneyIdx !== undefined) {
       if (diff < 0) {
         if (clickedJourneyIdx === currJourneyIdx) {
-          navigate('prev', Math.abs(diff), navAnn, fableRef, wait);
+          // navigate('prev', Math.abs(diff), navAnn, fableRef, wait);
           setMouseDisable(false);
           return;
         } else {
           const jrny = journeyData[clickedJourneyIdx];
           const firstAnnRefId = jrny.annsInOrder[0].refId;
           const firstAnnScreenId = jrny.annsInOrder[0].screenId;
-          goToFirstAnnOfModule(firstAnnScreenId, firstAnnRefId, fableRef);
+          goToParticularAnn(firstAnnScreenId, firstAnnRefId, fableRef);
           setJourneyIndex(clickedJourneyIdx);
           setCurrAnnRefId(firstAnnRefId);
           if (clickedAnnIdx === 0) {
@@ -56,17 +79,46 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
       }
     }
 
+    const destinationRefId = annConfigs && annConfigs.length > 0 ? annConfigs[clickedAnnIdx].refId : journeyData![clickedJourneyIdx!].annsInOrder[clickedAnnIdx].refId;
+    console.log('destinationRefId', destinationRefId);
+    navigateRef.current = {
+      direction: diff < 0 ? 'prev' : 'next',
+      destinationRefId,
+    };
+    setTimeout(() => {
+      setMouseDisable(false);
+      navAnn(diff < 0 ? 'prev' : 'next', fableRef);
+    }, wait);
+    return;
+
     if (diff < 0) {
-      navigate('prev', Math.abs(diff), navAnn, fableRef, wait);
+      // navigate('prev', Math.abs(diff), navAnn, fableRef, wait);
       setMouseDisable(false);
       return;
     }
     if (diff > 0) {
-      navigate('next', Math.abs(diff), navAnn, fableRef, wait);
+      // navigate('next', Math.abs(diff), navAnn, fableRef, wait);
       setMouseDisable(false);
       return;
     }
   };
+
+  useEffect(() => {
+    console.log('currAnnRefId', currAnnRefId);
+    if (navigateRef.current) {
+      console.log('navigateRef.current', navigateRef.current);
+      if (currAnnRefId === navigateRef.current.destinationRefId) {
+        console.log('currAnnRefId === navigateRef.current.destinationRefId');
+        setMouseDisable(false);
+        navigateRef.current = null;
+      } else {
+        console.log(navigateRef.current.direction, fableRef);
+        setTimeout(() => {
+          navAnn(navigateRef.current.direction, fableRef);
+        }, 1000);
+      }
+    }
+  }, [currAnnRefId]);
 
   const handleAnnotationClick = (idx: number, jIdx: number = 0) => {
     const journeyPresent = journeyData && journeyData.length > 0;

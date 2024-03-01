@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import type {
+import {
   IAnnotationConfig,
   NavigateToAnnMessage,
   EventMessageResponse,
   JourneyModuleWithAnns,
   Payload_AnnotationNav,
   Payload_DemoLoadingFinished,
+  ExtMsg
 } from './types';
 
 type OnAnnotationChange = (
@@ -41,14 +42,13 @@ const FableEmbed = (props: IProps) => {
     const str = JSON.stringify(param);
     const query = encodeURIComponent(btoa(str));
     const url = new URL(`p/demo/${demoRid}?c=${query}`, origin);
-    // convert to string
-    return String(url);
+    return url.href;
   };
 
   useEffect(() => {
     function handleMessage(res: NavigateToAnnMessage<EventMessageResponse>) {
       if (
-        res.data.type === 'on-navigation' &&
+        res.data.type === ExtMsg.OnNavigation &&
         props.onAnnotationChange
       ) {
         const data = res.data.payload as Payload_AnnotationNav;
@@ -60,7 +60,7 @@ const FableEmbed = (props: IProps) => {
           data.demoUrl,
         );
       }
-      if (res.data.type === 'demo-loading-finished' && props.onLoaded) {
+      if (res.data.type === ExtMsg.DemoLoadingFinished && props.onLoaded) {
         const data = res.data.payload as Payload_DemoLoadingFinished;
         props.onLoaded(
           data.annConfigs,

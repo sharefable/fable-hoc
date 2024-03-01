@@ -6,6 +6,7 @@ export const navAnn = (
 ) => {
   const win = fableRef.current;
   if (win) {
+    console.log('reached here');
     win.contentWindow?.postMessage(
       {
         type: 'navigate-to-annotation',
@@ -19,7 +20,7 @@ export const navAnn = (
   }
 };
 
-export const goToFirstAnnOfModule = (
+export const goToParticularAnn = (
   screenId: number,
   refId: string,
   fableRef: React.RefObject<HTMLIFrameElement>
