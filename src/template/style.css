@@ -1,0 +1,82 @@
+.fable-hoc {
+  width: 100%;
+  background: #FFF7F1;
+  display: flex;
+  flex-direction: column;
+  max-width: 1440px;
+  height: auto;
+}
+
+.fable-hoc .con-module-f-hoc {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 1rem;
+  flex: 0 0 auto;
+}
+
+.fable-hoc .con-fable-hoc {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  position: relative;
+}
+.fable-hoc .con-fable-hoc .con-demo {
+  width: 100%;
+  height: fit-content;
+  position: sticky;
+  z-index: 1;
+}
+
+.fable-hoc .con-fable-hoc .con-buttons {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 2rem;
+}
+
+.fable-hoc .con-fable-hoc .con-buttons .fable-nav {
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  padding: 1rem;
+}
+
+.fable-hoc .con-fable-hoc .con-ann-text {
+  margin: 1rem auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  scrollbar-width: thin;
+  max-height: 100%;
+}
+
+.fable-hoc .con-fable-hoc .con-text-journey {
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-bottom: 1px solid #bbb;
+}
+
+.fable-hoc .con-fable-hoc .ann-text {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  transition: box-shadow 0.8s ease;
+}
+
+.fable-hoc .con-fable-hoc .ann-text .ann-number {
+  border-radius: 1rem;
+  background: #E78895;
+  aspect-ratio: 1/1;
+  width: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  height: fit-content;
+  padding: 0.4rem;
+  min-width: fit-content;
+  min-height: fit-content;
+}
