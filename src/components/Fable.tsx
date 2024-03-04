@@ -2,11 +2,10 @@ import React, { useCallback, useState, useRef, useEffect } from 'react';
 import FableEmbed from '../components/FableEmbed';
 import './style.css';
 import { navAnn, goToParticularAnn, calculateDiff } from '../components/utils';
-import parse from 'html-react-parser';
-import markdown from '@wcj/markdown-to-html';
 import { IAnnotationConfig, JourneyModuleWithAnns } from '../components/types';
+import AnnotationText from './annotation-text/AnnotationText';
 
-interface IProps {
+export interface FableIProps {
   demoRid: string;
   layout?: 'sidebyside' | 'stacked';
   origin?: string;
@@ -18,7 +17,7 @@ interface INavigationRef {
   destinationRefId: string;
 }
 
-const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage = 30, ...rest }: IProps) => {
+const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage = 30, ...rest }: FableIProps) => {
   const [currAnnRefId, setCurrAnnRefId] = useState<string>('');
   const [isAnnLoaded, setIsAnnLoaded] = useState(false);
   const [journeyData, setJourneyData] = useState<JourneyModuleWithAnns[] | null>(null);
@@ -233,31 +232,14 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
               >
                 {journey.annsInOrder.map((ann, idx) => {
                   return (
-                    <div
-                      style={{
-                        boxShadow: currAnnRefId === ann.refId ? '0 0 0 2px rgba(0, 0, 0)' : '',
-                      }}
-                      className="ann-text"
+                    <AnnotationText
+                      ann={ann}
+                      idx={idx}
+                      jIdx={jIdx}
+                      handleAnnotationClick={handleAnnotationClick}
+                      currAnnRefId={currAnnRefId}
                       key={ann.refId}
-                      data-f-id={ann.refId}
-                      data-f-annidx={idx}
-                      onClick={() => {
-                        handleAnnotationClick(idx, jIdx);
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '0.4rem',
-                          width: '100%',
-                        }}
-                      >
-                        <span className="ann-number">
-                          {idx + 1}
-                        </span>
-                        <p>{ann.displayText}</p>
-                      </div>
-                    </div>
+                    />
                   );
                 })}
               </div>
@@ -265,31 +247,13 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
           })}
           {annConfigs && annConfigs.length > 0 && annConfigs.map((ann, idx) => {
             return (
-              <div
-                className="ann-text"
-                style={{
-                  boxShadow: currAnnRefId === ann.refId ? '0 0 0 2px rgba(0, 0, 0)' : '',
-                }}
+              <AnnotationText
+                ann={ann}
+                idx={idx}
+                handleAnnotationClick={handleAnnotationClick}
+                currAnnRefId={currAnnRefId}
                 key={ann.refId}
-                data-f-id={ann.refId}
-                data-f-annidx={idx}
-                onClick={() => {
-                  handleAnnotationClick(idx);
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: '0.4rem',
-                    width: '100%',
-                  }}
-                >
-                  <span className="ann-number">
-                    {idx + 1}
-                  </span>
-                  <p>{parse(markdown(ann.displayText) as string)}</p>
-                </div>
-              </div>
+              />
             );
           })}
         </div>
@@ -298,4 +262,4 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
   );
 };
 
-export default FableHoc;
+export default Fable;

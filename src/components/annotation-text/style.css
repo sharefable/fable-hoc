@@ -1,0 +1,22 @@
+.ann-text {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  transition: box-shadow 0.8s ease;
+}
+
+.ann-text .ann-number {
+  border-radius: 1rem;
+  background: #E78895;
+  aspect-ratio: 1/1;
+  width: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  height: fit-content;
+  padding: 0.4rem;
+  min-width: fit-content;
+  min-height: fit-content;
+}
