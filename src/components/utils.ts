@@ -63,20 +63,3 @@ export const calculateDiff = (
   }
   return diff;
 };
-
-export const navigate = (
-  direction: 'next' | 'prev',
-  noOfTimes: number,
-  navAnn: (dir: 'prev' | 'next', fableRef: React.RefObject<HTMLIFrameElement>) => void,
-  fableRef: React.RefObject<HTMLIFrameElement>,
-  wait: number = 1500
-) => {
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i >= noOfTimes - 1) {
-      clearInterval(interval);
-    }
-    navAnn(direction, fableRef);
-    i++;
-  }, wait);
-};
