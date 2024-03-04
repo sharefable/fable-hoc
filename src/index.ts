@@ -1,8 +1,4 @@
 import './global.css';
-import Fable from './components/Fable';
-import FableHoc from './template/FableHoc';
-import type { IFableData } from './components/types';
+import Fable from './components/FableHoc';
 
 export default Fable;
-export { FableHoc };
-export type { IFableData };

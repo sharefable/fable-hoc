@@ -2,6 +2,8 @@ import React, { useCallback, useState, useRef, useEffect } from 'react';
 import FableEmbed from '../components/FableEmbed';
 import './style.css';
 import { navAnn, goToParticularAnn, calculateDiff } from '../components/utils';
+import parse from 'html-react-parser';
+import markdown from '@wcj/markdown-to-html';
 import { IAnnotationConfig, JourneyModuleWithAnns } from '../components/types';
 
 interface IProps {
@@ -74,7 +76,6 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
     };
 
     setTimeout(() => {
-      setMouseDisable(false);
       navAnn(diff < 0 ? 'prev' : 'next', fableRef);
     }, 1500);
   };
@@ -286,7 +287,7 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
                   <span className="ann-number">
                     {idx + 1}
                   </span>
-                  <p>{ann.displayText}</p>
+                  <p>{parse(markdown(ann.displayText) as string)}</p>
                 </div>
               </div>
             );

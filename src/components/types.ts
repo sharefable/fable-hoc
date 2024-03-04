@@ -8,16 +8,6 @@ export interface IAnnotationConfigWithScreenId extends IAnnotationConfig {
   screenId: number
 }
 
-export interface IFableData {
-  version: number
-  demoRid: string
-  env: 'staging' | 'prod'
-  loadingContent: {
-    md: string
-  }
-  content: Array<{ index: number, md: string }>
-}
-
 export interface Payload_AnnotationNav extends CommonPayloadProps {
   currentAnnoationIndex: number;
   totalNumberOfAnnotationsInCurrentTimeline: number;
