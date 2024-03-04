@@ -1,5 +1,6 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import postcss from 'rollup-plugin-postcss';
 import ts from '@rollup/plugin-typescript';
 import typescript from 'typescript';
 import dts from 'rollup-plugin-dts';
@@ -35,6 +36,11 @@ const sharedPlugins = [
   commonjs({
     include: 'node_modules/**',
   }),
+  postcss({
+    extract: false,
+    inject: true,
+    minimize: true,
+  })
 ];
 
 const minifiedBuildFormats = buildFormats.map(({ file, ...rest }) => ({
