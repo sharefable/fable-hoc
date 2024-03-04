@@ -6,7 +6,6 @@ export const navAnn = (
 ) => {
   const win = fableRef.current;
   if (win) {
-    console.log('reached here');
     win.contentWindow?.postMessage(
       {
         type: 'navigate-to-annotation',

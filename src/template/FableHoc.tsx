@@ -28,30 +28,12 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
   const [disableMouse, setMouseDisable] = useState(false);
   const navigateRef = useRef<INavigationRef | null>(null);
 
-  const navigate = (
-    direction: 'next' | 'prev',
-    noOfTimes: number,
-    navAnn: (dir: 'prev' | 'next', fableRef: React.RefObject<HTMLIFrameElement>) => void,
-    fableRef: React.RefObject<HTMLIFrameElement>,
-    wait: number = 1500
-  ) => {
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i >= noOfTimes - 1) {
-        clearInterval(interval);
-      }
-      navAnn(direction, fableRef);
-      i++;
-    }, wait);
-  };
-
   const handleNavigation = (
     diff: number,
     clickedJourneyIdx: number | undefined,
     currJourneyIdx: number | undefined,
     clickedAnnIdx: number,
     journeyData: JourneyModuleWithAnns[] | null,
-    wait: number,
   ) => {
     if (diff === 0) {
       setMouseDisable(false);
@@ -61,8 +43,12 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
     if (journeyData && currJourneyIdx !== undefined && clickedJourneyIdx !== undefined) {
       if (diff < 0) {
         if (clickedJourneyIdx === currJourneyIdx) {
-          // navigate('prev', Math.abs(diff), navAnn, fableRef, wait);
-          setMouseDisable(false);
+          const destinationRefId = journeyData[currJourneyIdx].annsInOrder[clickedAnnIdx].refId;
+          navigateRef.current = {
+            direction: diff < 0 ? 'prev' : 'next',
+            destinationRefId,
+          };
+          navAnn(diff < 0 ? 'prev' : 'next', fableRef);
           return;
         } else {
           const jrny = journeyData[clickedJourneyIdx];
@@ -81,41 +67,26 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
     }
 
     const destinationRefId = annConfigs && annConfigs.length > 0 ? annConfigs[clickedAnnIdx].refId : journeyData![clickedJourneyIdx!].annsInOrder[clickedAnnIdx].refId;
-    console.log('destinationRefId', destinationRefId);
+
     navigateRef.current = {
       direction: diff < 0 ? 'prev' : 'next',
       destinationRefId,
     };
+
     setTimeout(() => {
       setMouseDisable(false);
       navAnn(diff < 0 ? 'prev' : 'next', fableRef);
-    }, wait);
-    return;
-
-    if (diff < 0) {
-      // navigate('prev', Math.abs(diff), navAnn, fableRef, wait);
-      setMouseDisable(false);
-      return;
-    }
-    if (diff > 0) {
-      // navigate('next', Math.abs(diff), navAnn, fableRef, wait);
-      setMouseDisable(false);
-      return;
-    }
+    }, 1500);
   };
 
   useEffect(() => {
-    console.log('currAnnRefId', currAnnRefId);
     if (navigateRef.current) {
-      console.log('navigateRef.current', navigateRef.current);
       if (currAnnRefId === navigateRef.current.destinationRefId) {
-        console.log('currAnnRefId === navigateRef.current.destinationRefId');
         setMouseDisable(false);
         navigateRef.current = null;
       } else {
-        console.log(navigateRef.current.direction, fableRef);
         setTimeout(() => {
-          navAnn(navigateRef.current.direction, fableRef);
+          navAnn(navigateRef.current!.direction, fableRef);
         }, 1000);
       }
     }
@@ -127,7 +98,6 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
     let currJourneyIdx;
     let currAnnIdx;
     const clickedAnnIdx = idx;
-    const wait = 1500;
     let diff: number = 0;
     if (journeyPresent) {
       clickedJourneyIdx = jIdx;
@@ -139,7 +109,7 @@ const FableHoc = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercenta
       currAnnIdx = annConfigs.findIndex((ann) => ann.refId === currAnnRefId);
       diff = clickedAnnIdx - currAnnIdx;
     }
-    handleNavigation(diff, clickedJourneyIdx, currJourneyIdx, clickedAnnIdx, journeyData, wait);
+    handleNavigation(diff, clickedJourneyIdx, currJourneyIdx, clickedAnnIdx, journeyData);
   };
 
   const onLoaded = useCallback((
