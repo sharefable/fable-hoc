@@ -74,7 +74,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
     };
     setTimeout(() => {
       navAnn(diff < 0 ? 'prev' : 'next', fableRef);
-    }, stopDuration <= 800 ? 800 : stopDuration);
+    }, stopDuration <= 600 ? 600 : stopDuration);
   };
 
   useEffect(() => {
@@ -85,12 +85,13 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
       } else {
         setTimeout(() => {
           navAnn(navigateRef.current!.direction, fableRef);
-        }, stopDuration <= 800 ? 800 : stopDuration);
+        }, stopDuration <= 600 ? 600 : stopDuration);
       }
     }
   }, [currAnnRefId]);
 
   const handleAnnotationClick = (idx: number, jIdx: number = 0) => {
+    if (disableMouse) return;
     const journeyPresent = journeyData && journeyData.length > 0;
     let clickedJourneyIdx;
     let currJourneyIdx;
@@ -112,13 +113,10 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
 
   const onLoaded = useCallback((
     annConfigsArr: IAnnotationConfig[],
-    demoUrl: string,
-    demoDisplayName: string,
-    demoRid: string,
     jrnyData: JourneyModuleWithAnns[] | null,
   ) => {
     setIsAnnLoaded(true);
-    console.log('Loaded...', annConfigsArr, demoUrl, demoDisplayName, demoRid, jrnyData);
+    console.log('Loaded...', annConfigsArr, demoRid, jrnyData);
     if (annConfigsArr && annConfigsArr.length) {
       setAnnConfigs(annConfigsArr);
       setCurrAnnRefId(annConfigsArr[0].refId);

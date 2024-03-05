@@ -8,25 +8,14 @@ export interface IAnnotationConfigWithScreenId extends IAnnotationConfig {
   screenId: number
 }
 
-export interface Payload_AnnotationNav extends CommonPayloadProps {
-  currentAnnoationIndex: number;
-  totalNumberOfAnnotationsInCurrentTimeline: number;
-  journeyName: string | null;
-  annotationConfig: IAnnotationConfig;
-  journeyIndex: number | null;
+export interface Payload_AnnotationNav {
   currentAnnotationRefId: string;
-  clickedButtonType: IAnnotationButtonType;
-}
-
-interface CommonPayloadProps {
-  demoRid: string,
-  demoDisplayName: string,
-  demoUrl: string
+  journeyIndex: number | null;
 }
 
 export type EventMessageResponse = Payload_AnnotationNav | Payload_DemoLoadingFinished;
 
-export interface Payload_DemoLoadingFinished extends CommonPayloadProps {
+export interface Payload_DemoLoadingFinished {
   annConfigs: IAnnotationConfig[]
   journeyData: JourneyModuleWithAnns[] | null
 }

@@ -12,16 +12,10 @@ import {
 type OnAnnotationChange = (
   currentAnnotationRefId: string,
   journeyIndex: number | null,
-  demoDisplayName: string,
-  demoRid: string,
-  demoUrl: string,
 ) => void;
 
 type OnLoaded = (
   annConfigs: IAnnotationConfig[],
-  demoUrl: string,
-  demoDisplayName: string,
-  demoRid: string,
   journeyData: JourneyModuleWithAnns[] | null
 ) => void;
 
@@ -47,6 +41,7 @@ const FableEmbed = (props: IProps) => {
 
   useEffect(() => {
     function handleMessage(res: NavigateToAnnMessage<EventMessageResponse>) {
+      console.log('FableEmbed: handleMessage', res);
       if (
         res.data.type === ExtMsg.OnNavigation &&
         props.onAnnotationChange
@@ -54,19 +49,13 @@ const FableEmbed = (props: IProps) => {
         const data = res.data.payload as Payload_AnnotationNav;
         props.onAnnotationChange(
           data.currentAnnotationRefId,
-          data.journeyIndex,
-          data.demoDisplayName,
-          data.demoRid,
-          data.demoUrl,
+          data.journeyIndex
         );
       }
       if (res.data.type === ExtMsg.DemoLoadingFinished && props.onLoaded) {
         const data = res.data.payload as Payload_DemoLoadingFinished;
         props.onLoaded(
           data.annConfigs,
-          data.demoUrl,
-          data.demoDisplayName,
-          data.demoRid,
           data.journeyData
         );
       }
