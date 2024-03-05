@@ -41,7 +41,6 @@ const FableEmbed = (props: IProps) => {
 
   useEffect(() => {
     function handleMessage(res: NavigateToAnnMessage<EventMessageResponse>) {
-      console.log('FableEmbed: handleMessage', res);
       if (
         res.data.type === ExtMsg.OnNavigation &&
         props.onAnnotationChange

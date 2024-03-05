@@ -116,7 +116,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
     jrnyData: JourneyModuleWithAnns[] | null,
   ) => {
     setIsAnnLoaded(true);
-    console.log('Loaded...', annConfigsArr, demoRid, jrnyData);
+    // console.log('Loaded...', annConfigsArr, demoRid, jrnyData);
     if (annConfigsArr && annConfigsArr.length) {
       setAnnConfigs(annConfigsArr);
       setCurrAnnRefId(annConfigsArr[0].refId);
