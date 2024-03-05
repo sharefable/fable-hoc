@@ -8,7 +8,9 @@
   border-radius: 1rem;
   background: #E78895;
   aspect-ratio: 1/1;
-  width: 2rem;
+  width: 1.6rem;
+  max-width: 1.6rem;
+  max-height: 1.6rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,6 +19,4 @@
   font-weight: bold;
   height: fit-content;
   padding: 0.4rem;
-  min-width: fit-content;
-  min-height: fit-content;
 }

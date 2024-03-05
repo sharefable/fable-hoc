@@ -10,6 +10,7 @@ export interface FableIProps {
   layout?: 'sidebyside' | 'stacked';
   origin?: string;
   contentWidthPercentage?: number;
+  stopDuration?: number;
 }
 
 interface INavigationRef {
@@ -17,7 +18,7 @@ interface INavigationRef {
   destinationRefId: string;
 }
 
-const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage = 30, ...rest }: FableIProps) => {
+const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage = 30, stopDuration = 1000, ...rest }: FableIProps) => {
   const [currAnnRefId, setCurrAnnRefId] = useState<string>('');
   const [isAnnLoaded, setIsAnnLoaded] = useState(false);
   const [journeyData, setJourneyData] = useState<JourneyModuleWithAnns[] | null>(null);
@@ -66,17 +67,14 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
         }
       }
     }
-
     const destinationRefId = annConfigs && annConfigs.length > 0 ? annConfigs[clickedAnnIdx].refId : journeyData![clickedJourneyIdx!].annsInOrder[clickedAnnIdx].refId;
-
     navigateRef.current = {
       direction: diff < 0 ? 'prev' : 'next',
       destinationRefId,
     };
-
     setTimeout(() => {
       navAnn(diff < 0 ? 'prev' : 'next', fableRef);
-    }, 1500);
+    }, stopDuration <= 800 ? 800 : stopDuration);
   };
 
   useEffect(() => {
@@ -87,7 +85,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
       } else {
         setTimeout(() => {
           navAnn(navigateRef.current!.direction, fableRef);
-        }, 1000);
+        }, stopDuration <= 800 ? 800 : stopDuration);
       }
     }
   }, [currAnnRefId]);
@@ -165,11 +163,9 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
     <div className="fable-hoc" {...rest}>
       <div className="con-module-f-hoc">
         {journeyData && journeyData?.map((item) => (
-          <div key={`journey-${item.main}`}>
-            <div>
-              <h1>{item.header1}</h1>
-              <p>{item.header2}</p>
-            </div>
+          <div className="journey-data" key={`journey-${item.main}`}>
+            <h1>{item.header1}</h1>
+            <p>{item.header2}</p>
           </div>
         ))}
       </div>
@@ -230,6 +226,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
                 key={journey.main}
                 className="con-text-journey"
               >
+                <h3 className="journey-title">{journey.header1}</h3>
                 {journey.annsInOrder.map((ann, idx) => {
                   return (
                     <AnnotationText
