@@ -42,10 +42,10 @@ const FableEmbed = (props: IProps) => {
   useEffect(() => {
     function handleMessage(res: NavigateToAnnMessage<EventMessageResponse>) {
       if (
-        res.data.type === ExtMsg.OnNavigation &&
-        props.onAnnotationChange
+        res.data.type === ExtMsg.OnNavigation && props.onAnnotationChange
       ) {
         const data = res.data.payload as Payload_AnnotationNav;
+        console.log('onChange data', data);
         props.onAnnotationChange(
           data.currentAnnotationRefId,
           data.journeyIndex
@@ -53,6 +53,7 @@ const FableEmbed = (props: IProps) => {
       }
       if (res.data.type === ExtMsg.DemoLoadingFinished && props.onLoaded) {
         const data = res.data.payload as Payload_DemoLoadingFinished;
+        console.log('onLoaded data', data);
         props.onLoaded(
           data.annConfigs,
           data.journeyData

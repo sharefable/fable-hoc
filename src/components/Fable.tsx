@@ -116,7 +116,6 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
     jrnyData: JourneyModuleWithAnns[] | null,
   ) => {
     setIsAnnLoaded(true);
-    // console.log('Loaded...', annConfigsArr, demoRid, jrnyData);
     if (annConfigsArr && annConfigsArr.length) {
       setAnnConfigs(annConfigsArr);
       setCurrAnnRefId(annConfigsArr[0].refId);
@@ -178,7 +177,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
           className="con-demo"
           ref={fableConRef}
           style={{
-            top: layout === 'sidebyside' ? '1.5rem' : '0',
+            top: layout === 'sidebyside' ? '1.5rem' : '170px',
           }}
         >
           <FableEmbed
