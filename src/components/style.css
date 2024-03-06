@@ -1,0 +1,115 @@
+.fable-hoc {
+  width: 100%;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  max-width: 1440px;
+  height: auto;
+}
+
+.fable-hoc .con-module-f-hoc {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  flex: 0 0 auto;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  gap: 2.6rem;
+}
+
+.fable-hoc .con-module-f-hoc .journey-data {
+  color: #333;
+  position: relative;
+  flex: none;
+}
+
+.fable-hoc .con-module-f-hoc .journey-data h1 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.fable-hoc .con-module-f-hoc .journey-data:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -1.3rem;
+  content: "";
+  width: 1.4rem;
+  height: 1.4rem;
+  border-top: 3px solid black;
+  border-right: 3px solid black;
+  transform-origin: center;
+  transform: translate(.3rem, -50%) rotate(45deg);
+}
+
+.fable-hoc .con-fable-hoc {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  position: relative;
+}
+.fable-hoc .con-fable-hoc .con-demo {
+  width: 100%;
+  height: fit-content;
+  position: sticky;
+  z-index: 1;
+}
+
+.fable-hoc .con-fable-hoc .con-buttons {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 2rem;
+}
+
+.fable-hoc .con-fable-hoc .con-buttons .fable-nav {
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  padding: 1rem;
+}
+
+.fable-hoc .con-fable-hoc .con-ann-text {
+  margin: 1rem auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  scrollbar-width: thin;
+  max-height: 100%;
+}
+
+.fable-hoc .con-fable-hoc .con-text-journey {
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-bottom: 1px solid #bbb;
+}
+.fable-hoc .con-fable-hoc .con-text-journey .journey-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-bottom: 0.4rem;
+}
+
+.fable-hoc .con-fable-hoc .ann-text {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  transition: box-shadow 0.8s ease;
+}
+
+.fable-hoc .con-fable-hoc .ann-text .ann-number {
+  border-radius: 1rem;
+  background: #E78895;
+  aspect-ratio: 1/1;
+  width: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  height: fit-content;
+  padding: 0.4rem;
+  min-width: fit-content;
+  min-height: fit-content;
+}

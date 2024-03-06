@@ -1,48 +1,62 @@
 import React, { useEffect } from 'react';
-import type { IAnnotationConfig, NavigateToAnnMessage, EventMessageResponse } from './types';
+import {
+  IAnnotationConfig,
+  NavigateToAnnMessage,
+  EventMessageResponse,
+  JourneyModuleWithAnns,
+  Payload_AnnotationNav,
+  Payload_DemoLoadingFinished,
+  ExtMsg
+} from './types';
 
 type OnAnnotationChange = (
-  currentAnnoationIndex: number,
-  totalNumberOfAnnotationsInCurrentTimeline: number,
-  journeyName: string | null,
-  annotationConfig: IAnnotationConfig,
-  demoDisplayName: string,
-  demoRid: string,
-  demoUrl: string
+  currentAnnotationRefId: string,
+  journeyIndex: number | null,
 ) => void;
 
 type OnLoaded = (
   annConfigs: IAnnotationConfig[],
-  demoUrl: string,
-  demoDisplayName: string,
-  demoRid: string
+  journeyData: JourneyModuleWithAnns[] | null
 ) => void;
 
 interface IProps {
-  demoRid: string
-  innerRef?: React.Ref<HTMLIFrameElement>
-  onLoaded?: OnLoaded
-  onAnnotationChange?: OnAnnotationChange
+  demoRid: string;
+  innerRef?: React.Ref<HTMLIFrameElement>;
+  onLoaded?: OnLoaded;
+  onAnnotationChange?: OnAnnotationChange;
+  style?: React.CSSProperties;
+  origin?: string;
 }
 
 const FableEmbed = (props: IProps) => {
 
+  const getDemoUrl = (demoRid: string, params?: { hm: 0 | 1, ha: 0 | 1 }) => {
+    const origin = props.origin || 'https://app.sharefable.com';
+    const param = params || { hm: 1, ha: 1 };
+    const str = JSON.stringify(param);
+    const query = encodeURIComponent(btoa(str));
+    const url = new URL(`p/demo/${demoRid}?c=${query}`, origin);
+    return url.href;
+  };
+
   useEffect(() => {
     function handleMessage(res: NavigateToAnnMessage<EventMessageResponse>) {
-      const data = res.data.payload;
-      if (res.data.type === 'on-annotation-navigation' && props.onAnnotationChange) {
+      if (
+        res.data.type === ExtMsg.OnNavigation &&
+        props.onAnnotationChange
+      ) {
+        const data = res.data.payload as Payload_AnnotationNav;
         props.onAnnotationChange(
-          data.currentAnnoationIndex,
-          data.totalNumberOfAnnotationsInCurrentTimeline,
-          data.journeyName,
-          data.annotationConfig,
-          data.demoDisplayName,
-          data.demoRid,
-          data.demoUrl,
+          data.currentAnnotationRefId,
+          data.journeyIndex
         );
       }
-      if (res.data?.type === 'demo-loading-finished' && props.onLoaded) {
-        props.onLoaded(data.annConfigs, data.demoUrl, data.demoDisplayName, data.demoRid);
+      if (res.data.type === ExtMsg.DemoLoadingFinished && props.onLoaded) {
+        const data = res.data.payload as Payload_DemoLoadingFinished;
+        props.onLoaded(
+          data.annConfigs,
+          data.journeyData
+        );
       }
     }
 
@@ -60,10 +74,12 @@ const FableEmbed = (props: IProps) => {
         border: '1px solid rgba(0, 0, 0, 0.1)',
         width: '100%',
         height: '100%',
-        marginTop: '1rem'
+        marginTop: '1rem',
+        ...props.style,
       }}
+      height="100%"
       className="fable-embed"
-      src={`https://app.staging.sharefable.com/p/demo/${props.demoRid}`}
+      src={getDemoUrl(props.demoRid)}
       allowFullScreen
       id="sharefable"
     />

@@ -1,30 +1,27 @@
-export interface IFableData {
-  version: number
-  demoRid: string
-  env: 'staging' | 'prod'
-  loadingContent: {
-    md: string
-  }
-  content: Array<{ index: number, md: string }>
+export interface JourneyFlow {
+  header1: string;
+  header2: string;
+  main: string;
 }
 
-export interface Payload_AnnotationNav extends CommonPayloadProps {
-  currentAnnoationIndex: number;
-  totalNumberOfAnnotationsInCurrentTimeline: number;
-  journeyName: string | null;
-  annotationConfig: IAnnotationConfig;
+export interface IAnnotationConfigWithScreenId extends IAnnotationConfig {
+  screenId: number
 }
 
-interface CommonPayloadProps {
-  demoRid: string,
-  demoDisplayName: string,
-  demoUrl: string
+export interface Payload_AnnotationNav {
+  currentAnnotationRefId: string;
+  journeyIndex: number | null;
 }
 
-export type EventMessageResponse = Payload_AnnotationNav & Payload_DemoLoadingFinished;
+export type EventMessageResponse = Payload_AnnotationNav | Payload_DemoLoadingFinished;
 
-export interface Payload_DemoLoadingFinished extends CommonPayloadProps {
+export interface Payload_DemoLoadingFinished {
   annConfigs: IAnnotationConfig[]
+  journeyData: JourneyModuleWithAnns[] | null
+}
+
+export interface JourneyModuleWithAnns extends JourneyFlow {
+  annsInOrder: IAnnotationConfigWithScreenId[]
 }
 
 export interface IAnnotationConfig extends IAnnotationOriginConfig {
@@ -47,7 +44,7 @@ interface MsgBase {
 export enum ExtMsg {
   DemoLoadingStarted = 'demo-loading-started',
   DemoLoadingFinished = 'demo-loading-finished',
-  OnAnnotationNav = 'on-annotation-navigation',
+  OnNavigation = 'on-navigation',
   JourneySwitch = 'journey-switch',
   NavToAnnotation = 'navigate-to-annotation'
 }
