@@ -17,7 +17,7 @@ const AnnotationText = (props: AnnotationTextProps) => {
       style={{
         boxShadow: props.currAnnRefId === props.ann.refId ? '0 0 0 2px rgba(0, 0, 0)' : '',
         position: props.layout === 'stacked' ? 'sticky' : 'static',
-        top: props.layout === 'stacked' ? '170px' : 'auto',
+        top: props.layout === 'stacked' ? '175px' : 'auto',
       }}
       className="ann-text"
       key={props.ann.refId}
@@ -37,7 +37,7 @@ const AnnotationText = (props: AnnotationTextProps) => {
         <span className="ann-number">
           {props.idx + 1}
         </span>
-        <p>{props.ann.displayText}</p>
+        <p style={{ margin: 0 }}>{props.ann.displayText}</p>
       </div>
     </div>
   );
