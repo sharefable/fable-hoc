@@ -11,6 +11,7 @@ export interface FableIProps {
   origin?: string;
   contentWidthPercentage?: number;
   stopDuration?: number;
+  top?: number;
 }
 
 interface INavigationRef {
@@ -18,7 +19,7 @@ interface INavigationRef {
   destinationRefId: string;
 }
 
-const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage = 30, stopDuration = 1000, ...rest }: FableIProps) => {
+const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage = 30, stopDuration = 1000, top, ...rest }: FableIProps) => {
   const [currAnnRefId, setCurrAnnRefId] = useState<string>('');
   const [isAnnLoaded, setIsAnnLoaded] = useState(false);
   const [journeyData, setJourneyData] = useState<JourneyModuleWithAnns[] | null>(null);
@@ -156,6 +157,39 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
     }
   }, [currAnnRefId]);
 
+  useEffect(() => {
+    const handleScroll = (fableRect: DOMRect) => {
+      const annText = textContainerRef.current?.querySelectorAll('.ann-text');
+      if (!annText) return;
+
+      annText.forEach((ann) => {
+        const annRect = ann.getBoundingClientRect();
+        console.log(fableRect.bottom, annRect.bottom, fableRect.y, ann);
+        if ((fableRect.bottom - annRect.height - 30) < annRect.top && fableRect.top > 0) {
+          (ann as HTMLDivElement).style.visibility = 'visible';
+        } else {
+          (ann as HTMLDivElement).style.visibility = 'hidden';
+        }
+      });
+    };
+
+    if (layout === 'sidebyside' && !isAnnLoaded) return;
+
+    const handleWindowScroll = () => {
+      const fableCon = fableConRef.current;
+      if (!fableCon) return;
+
+      const fableConRect = fableCon.getBoundingClientRect();
+      handleScroll(fableConRect);
+    };
+
+    window.addEventListener('scroll', handleWindowScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleWindowScroll);
+    };
+  }, [layout, isAnnLoaded]);
+
   return (
     <div className="fable-hoc" {...rest}>
       <div className="con-module-f-hoc">
@@ -177,7 +211,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
           className="con-demo"
           ref={fableConRef}
           style={{
-            top: layout === 'sidebyside' ? '1.5rem' : '170px',
+            top: layout === 'sidebyside' ? top || '1.5rem' : top || '170px',
           }}
         >
           <FableEmbed
