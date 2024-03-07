@@ -9,11 +9,13 @@ export interface IAnnotationConfigWithScreenId extends IAnnotationConfig {
 export interface Payload_AnnotationNav {
     currentAnnotationRefId: string;
     journeyIndex: number | null;
+    demoRid: string;
 }
 export type EventMessageResponse = Payload_AnnotationNav | Payload_DemoLoadingFinished;
 export interface Payload_DemoLoadingFinished {
     annConfigs: IAnnotationConfig[];
     journeyData: JourneyModuleWithAnns[] | null;
+    demoRid: string;
 }
 export interface JourneyModuleWithAnns extends JourneyFlow {
     annsInOrder: IAnnotationConfigWithScreenId[];

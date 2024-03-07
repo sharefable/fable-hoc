@@ -7,6 +7,7 @@ interface AnnotationTextProps {
     jIdx?: number;
     handleAnnotationClick: (idx: number, jIdx?: number) => void;
     currAnnRefId: string;
+    layout: 'sidebyside' | 'stacked';
 }
 declare const AnnotationText: (props: AnnotationTextProps) => React.JSX.Element;
 export default AnnotationText;

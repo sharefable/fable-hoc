@@ -6,6 +6,7 @@ export interface FableIProps {
     origin?: string;
     contentWidthPercentage?: number;
     stopDuration?: number;
+    top?: number;
 }
-declare const Fable: ({ layout, origin, demoRid, contentWidthPercentage, stopDuration, ...rest }: FableIProps) => React.JSX.Element;
+declare const Fable: ({ layout, origin, demoRid, contentWidthPercentage, stopDuration, top, ...rest }: FableIProps) => React.JSX.Element;
 export default Fable;

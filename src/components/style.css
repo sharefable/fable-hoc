@@ -95,6 +95,7 @@
   padding: 1rem;
   border-radius: 0.5rem;
   transition: box-shadow 0.8s ease;
+  transition: visibility 0.3s ease-out;
 }
 
 .fable-hoc .con-fable-hoc .ann-text .ann-number {
