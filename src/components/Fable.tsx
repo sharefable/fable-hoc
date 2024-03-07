@@ -233,6 +233,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
                       handleAnnotationClick={handleAnnotationClick}
                       currAnnRefId={currAnnRefId}
                       key={ann.refId}
+                      layout={layout}
                     />
                   );
                 })}
@@ -247,6 +248,7 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
                 handleAnnotationClick={handleAnnotationClick}
                 currAnnRefId={currAnnRefId}
                 key={ann.refId}
+                layout={layout}
               />
             );
           })}
