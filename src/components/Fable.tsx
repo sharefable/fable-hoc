@@ -173,10 +173,10 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
           }
         }
         if (layout === 'sidebyside') {
-          if (fableRect.bottom < annRect.bottom && fableRect.top > annRect.top) {
-            (ann as HTMLDivElement).style.visibility = 'visible';
-          } else {
+          if (fableRect.top < annRect.bottom) {
             (ann as HTMLDivElement).style.visibility = 'hidden';
+          } else {
+            (ann as HTMLDivElement).style.visibility = 'visible';
           }
         }
       });
