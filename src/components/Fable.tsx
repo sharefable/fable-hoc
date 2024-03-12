@@ -165,10 +165,19 @@ const Fable = ({ layout = 'sidebyside', origin, demoRid, contentWidthPercentage 
       annText.forEach((ann) => {
         const annRect = ann.getBoundingClientRect();
         console.log(fableRect.bottom, annRect.bottom, fableRect.y, ann);
-        if ((fableRect.bottom - annRect.height - 30) < annRect.top && fableRect.top > 0) {
-          (ann as HTMLDivElement).style.visibility = 'visible';
-        } else {
-          (ann as HTMLDivElement).style.visibility = 'hidden';
+        if (layout === 'stacked') {
+          if ((fableRect.bottom - annRect.height - 30) < annRect.top && fableRect.top > 0) {
+            (ann as HTMLDivElement).style.visibility = 'visible';
+          } else {
+            (ann as HTMLDivElement).style.visibility = 'hidden';
+          }
+        }
+        if (layout === 'sidebyside') {
+          if (fableRect.bottom < annRect.bottom && fableRect.top > annRect.top) {
+            (ann as HTMLDivElement).style.visibility = 'visible';
+          } else {
+            (ann as HTMLDivElement).style.visibility = 'hidden';
+          }
         }
       });
     };
